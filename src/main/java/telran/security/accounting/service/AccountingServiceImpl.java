@@ -5,6 +5,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -20,19 +21,26 @@ import telran.security.accounting.model.Account;
 @RequiredArgsConstructor
 public class AccountingServiceImpl implements AccountingService {
 	final MongoTemplate mongoTemplate;
+	final PasswordEncoder passwordEncoder;
 
 	@Override
 	public AccountDto addAccount(AccountDto accountDto) {
 		String email = accountDto.email();
 		Account acc;
+		AccountDto encodedAccount = getEncoded(accountDto);
 		try {
-			acc = mongoTemplate.insert(Account.of(accountDto));
+			acc = mongoTemplate.insert(Account.of(encodedAccount));
 		} catch (DuplicateKeyException e) {
 			log.error("----> Account {}, already exists", email);
 			throw new AccountStateException(email);
 		}
 		log.debug("----> Account {} has been added", email);
 		return acc.build();
+	}
+
+	private AccountDto getEncoded(AccountDto accountDto) {
+
+		return new AccountDto(accountDto.email(), passwordEncoder.encode(accountDto.password()), accountDto.roles());
 	}
 
 	@Override
