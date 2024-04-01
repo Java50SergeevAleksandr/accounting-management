@@ -81,7 +81,7 @@ public class AccountingServiceImpl implements AccountingService {
 
 		Query query = new Query(Criteria.where("email").is(email));
 		Update update = new Update();
-		update.set("password", passwordEncoder.encode(newPassword));
+		update.set("hashPassword", passwordEncoder.encode(newPassword));
 		Account res = mongoTemplate.findAndModify(query, update, options, Account.class);
 		if (res == null ) {
 			log.error("----> AccountNotFoundException {}, email");
