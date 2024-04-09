@@ -28,6 +28,7 @@ public class SecurityConfiguration {
 		httpSecurity.authorizeHttpRequests(customizer -> customizer.requestMatchers(HttpMethod.DELETE).hasRole("USER")
 				.requestMatchers(HttpMethod.POST).hasRole("ADMIN").requestMatchers(HttpMethod.PUT).authenticated());
 		httpSecurity.httpBasic(Customizer.withDefaults());
+		httpSecurity.sessionManagement(customizer -> customizer.sessionCreationPolicy(SessionCreationPolicy.ALWAYS));
 		return httpSecurity.build();
 	}
 }
